@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import vyshu.net.api_cassava.utils.ValidateDataUsersUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -56,8 +57,29 @@ public class UserRepository {
         }
     }
 
+    public boolean existsTokenByEmail(String email, String token) {
+        String sql = "SELECT COUNT(*) FROM user_tokens WHERE email = ? AND token = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email, token);
+        return count != null && count > 0;
+    }
+
+    public void saveToken(String email, String token, String device, String tokenId) {
+        String sql = "INSERT INTO user_tokens (email, token, device, token_id) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, email, token, device, tokenId);
+    }
+
+    public void revokeTokenById(String tokenId) {
+        String sql = "DELETE FROM user_tokens WHERE token_id = ?";
+        jdbcTemplate.update(sql, tokenId);
+    }
+
     public void updateLastConnection(String email) {
         String sql = "UPDATE users SET last_connection = NOW() WHERE email = ?";
         jdbcTemplate.update(sql, email);
+    }
+
+    public List<String> findAllTokensByEmail(String email) {
+        String sql = "SELECT token_id FROM user_tokens WHERE email = ?";
+        return jdbcTemplate.query(sql, ps -> ps.setString(1, email), (rs, rowNum) -> rs.getString("token_id"));
     }
 }

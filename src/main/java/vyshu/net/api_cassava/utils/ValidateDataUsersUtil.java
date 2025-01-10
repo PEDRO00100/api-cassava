@@ -19,9 +19,9 @@ public class ValidateDataUsersUtil {
 
     public static String verifyPassword(String password) {
         if (password.length() < 10) {
-            return "Password too short";
+            return "Password too short, must be at least 10 characters";
         } else if (password.length() > 60) {
-            return "Password too long";
+            return "Password too long, must be at most 60 characters";
         } else if (password.contains(" ")) {
             return "Password cannot contain spaces";
         } else {

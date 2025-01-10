@@ -2,6 +2,7 @@ package vyshu.net.api_cassava.services;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,11 +37,15 @@ public class AuthService {
         }
 
         Map<String, Object> user = userOptional.get();
-        return jwtUtil.generateToken(
+        String tokenId = UUID.randomUUID().toString();
+
+        String token = jwtUtil.generateToken(
                 (String) user.get("username"),
                 (String) user.get("email"),
                 (String) user.getOrDefault("role", "user"),
-                device);
+                device, tokenId);
+        userRepository.saveToken(email, token, device, tokenId);
+        return token;
     }
 
     public String login(String identifier, String password, String device) {
@@ -57,10 +62,13 @@ public class AuthService {
         }
 
         userRepository.updateLastConnection((String) user.get("email"));
-        return jwtUtil.generateToken(
+        String tokenId = UUID.randomUUID().toString();
+        String token = jwtUtil.generateToken(
                 (String) user.get("username"),
                 (String) user.get("email"),
-                (String) user.get("role"),
-                device);
+                (String) user.getOrDefault("role", "user"),
+                device, tokenId);
+        userRepository.saveToken((String) user.get("email"), token, device, tokenId);
+        return token;
     }
 }

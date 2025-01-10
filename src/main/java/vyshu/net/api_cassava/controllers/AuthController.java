@@ -63,11 +63,39 @@ public class AuthController {
         Map<String, String> response = new HashMap<>();
         if (jwtUtil.validateToken(token)) {
             String email = jwtUtil.extractEmail(token);
-            userRepository.updateLastConnection(email);
-            response.put("message", "Token is valid");
-            return new ResponseEntity<>(response, HttpStatus.OK);
+                userRepository.updateLastConnection(email);
+                response.put("message", "Token is valid");
+                return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             response.put("message", "Token is invalid");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/logout")
+    public String postMethodName(@RequestParam(required = true) String token) {
+        if (jwtUtil.validateToken(token)) {
+            String UUID = jwtUtil.extractUUID(token);
+            userRepository.revokeTokenById(UUID);
+            return "Token revoked successfully";
+        }
+        return "Invalid token";
+    }
+
+    @PostMapping("/revoke/token")
+    public ResponseEntity<Map<String, String>> revokeToken(@RequestParam(required = true) String tokenId,
+            @RequestParam(required = true) String token) {
+        Map<String, String> response = new HashMap<>();
+        if (!jwtUtil.validateToken(token)) {
+            response.put("error", "Invalid token");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            userRepository.revokeTokenById(tokenId);
+            response.put("message", "Token revoked successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Error e) {
+            response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
