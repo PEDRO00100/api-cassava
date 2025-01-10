@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -25,6 +26,18 @@ public class HandlerExceptionController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(error);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDto> illegalArgumentHandler(Exception ex) {
+        ErrorDto error = new ErrorDto(HttpStatus.BAD_REQUEST.value(), "Bad request", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(error);
+    }
+    
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorDto> methodNotAllowedHandler(Exception ex) {
+        ErrorDto error = new ErrorDto(HttpStatus.METHOD_NOT_ALLOWED.value(), "Method not allowed", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED.value()).body(error);
+    }
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDto> globalErrorHandler(Exception ex) {
         ErrorDto error = new ErrorDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error",

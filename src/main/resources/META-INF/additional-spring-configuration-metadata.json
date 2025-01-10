@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "SecretKey in base 64 for jwt",
+      "deprecated": false
+    }
+  ]
+}

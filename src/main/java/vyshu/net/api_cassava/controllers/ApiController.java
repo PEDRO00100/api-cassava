@@ -15,11 +15,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-public class MainController {
+public class ApiController {
 
     private final WebScrapingService webScrapingService;
 
-    public MainController(WebScrapingService webScrapingService) {
+    public ApiController(WebScrapingService webScrapingService) {
         this.webScrapingService = webScrapingService;
     }
 
