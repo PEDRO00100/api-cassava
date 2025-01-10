@@ -29,11 +29,14 @@ public class UserRepository {
     }
 
     public void registerUser(String username, String email, String password) {
-        if (existsByEmail(email)) {
-            throw new IllegalArgumentException("Email is already registered");
+        if (existsByUsername(username) && existsByEmail(email)) {
+            throw new IllegalArgumentException("Username and email are already taken");
         }
         if (existsByUsername(username)) {
             throw new IllegalArgumentException("Username is already taken");
+        }
+        if (existsByEmail(email)) {
+            throw new IllegalArgumentException("Email is already registered");
         }
         String sql = "INSERT INTO users (username, email, password, last_connection) VALUES (?, ?, ?, NOW())";
         jdbcTemplate.update(sql, username, email, password);

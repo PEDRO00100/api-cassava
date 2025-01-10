@@ -23,10 +23,6 @@ public class AuthService {
     }
 
     public String register(String username, String email, String password) {
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email is already registered");
-        }
-
         String encodedPassword = passwordEncoder.encode(password);
         userRepository.registerUser(username, email, encodedPassword);
 
