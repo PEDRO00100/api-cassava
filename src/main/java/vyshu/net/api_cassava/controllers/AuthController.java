@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vyshu.net.api_cassava.repositories.UserRepository;
 import vyshu.net.api_cassava.services.AuthService;
 import vyshu.net.api_cassava.utils.JwtUtil;
 
@@ -18,10 +19,12 @@ import vyshu.net.api_cassava.utils.JwtUtil;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    public AuthController(AuthService authService, JwtUtil jwtUtil) {
+    public AuthController(AuthService authService, JwtUtil jwtUtil, UserRepository userRepository) {
         this.authService = authService;
+        this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -56,6 +59,8 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> validateToken(@RequestParam(required = true) String token) {
         Map<String, String> response = new HashMap<>();
         if (jwtUtil.validateToken(token)) {
+            String email = jwtUtil.extractEmail(token);
+            userRepository.updateLastConnection(email);
             response.put("message", "Token is valid");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {

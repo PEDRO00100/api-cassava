@@ -39,12 +39,12 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extractSubject(String token) {
-        return extractAllClaims(token).getSubject();
-    }
-
     public String extractUsername(String token) {
         return extractClaim(token, "username");
+    }
+
+    public String extractEmail(String token) {
+        return extractClaim(token, "email");
     }
 
     public String extractRole(String token) {
