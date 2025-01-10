@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
 import vyshu.net.api_cassava.repositories.UserRepository;
 import vyshu.net.api_cassava.services.AuthService;
 import vyshu.net.api_cassava.utils.JwtUtil;
@@ -30,10 +31,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestParam(required = true) String identifier,
-            @RequestParam(required = true) String password) {
+            @RequestParam(required = true) String password, HttpServletRequest request) {
         Map<String, String> response = new HashMap<>();
+        String device = request.getHeader("User-Agent");
         try {
-            response.put("Bearer", authService.login(identifier, password));
+            response.put("Bearer", authService.login(identifier, password, device));
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Error e) {
             response.put("error", e.getMessage());
@@ -44,11 +46,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestParam(required = true) String username,
             @RequestParam(required = true) String email,
-            @RequestParam(required = true) String password) {
+            @RequestParam(required = true) String password, HttpServletRequest request) {
         Map<String, String> response = new HashMap<>();
+        String device = request.getHeader("User-Agent");
         try {
-            response.put("Bearer", authService.register(username, email, password));
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            response.put("Bearer", authService.register(username, email, password, device));
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Error e) {
             response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

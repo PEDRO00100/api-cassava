@@ -4,6 +4,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import vyshu.net.api_cassava.utils.ValidateDataUsersUtil;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,6 +39,9 @@ public class UserRepository {
         }
         if (existsByEmail(email)) {
             throw new IllegalArgumentException("Email is already registered");
+        }
+        if (!ValidateDataUsersUtil.verifyEmail(email).equals("Valid")) {
+            throw new IllegalArgumentException(ValidateDataUsersUtil.verifyEmail(email));
         }
         String sql = "INSERT INTO users (username, email, password, last_connection) VALUES (?, ?, ?, NOW())";
         jdbcTemplate.update(sql, username, email, password);

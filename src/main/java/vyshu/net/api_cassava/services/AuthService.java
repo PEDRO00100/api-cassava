@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import vyshu.net.api_cassava.repositories.UserRepository;
 import vyshu.net.api_cassava.utils.JwtUtil;
+import vyshu.net.api_cassava.utils.ValidateDataUsersUtil;
 
 @Service
 public class AuthService {
@@ -22,7 +23,10 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public String register(String username, String email, String password) {
+    public String register(String username, String email, String password, String device) {
+        if (!ValidateDataUsersUtil.verifyPassword(password).equals("Valid")) {
+            throw new IllegalArgumentException(ValidateDataUsersUtil.verifyPassword(password));
+        }
         String encodedPassword = passwordEncoder.encode(password);
         userRepository.registerUser(username, email, encodedPassword);
 
@@ -35,10 +39,11 @@ public class AuthService {
         return jwtUtil.generateToken(
                 (String) user.get("username"),
                 (String) user.get("email"),
-                (String) user.getOrDefault("role", "user"));
+                (String) user.getOrDefault("role", "user"),
+                device);
     }
 
-    public String login(String identifier, String password) {
+    public String login(String identifier, String password, String device) {
         Optional<Map<String, Object>> userOptional = userRepository.findByEmailOrUsername(identifier);
 
         if (userOptional.isEmpty()) {
@@ -55,6 +60,7 @@ public class AuthService {
         return jwtUtil.generateToken(
                 (String) user.get("username"),
                 (String) user.get("email"),
-                (String) user.get("role"));
+                (String) user.get("role"),
+                device);
     }
 }

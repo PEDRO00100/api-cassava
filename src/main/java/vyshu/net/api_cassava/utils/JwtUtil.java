@@ -28,11 +28,12 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(decodedKey);
     }
 
-    public String generateToken(String username, String email, String role) {
+    public String generateToken(String username, String email, String role, String device) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("email", email)
                 .claim("role", role)
+                .claim("device", device)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -49,6 +50,10 @@ public class JwtUtil {
 
     public String extractRole(String token) {
         return extractClaim(token, "role");
+    }
+
+    public String extractDevice(String token) {
+        return extractClaim(token, "device");
     }
 
     public boolean validateToken(String token) {
