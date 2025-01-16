@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import vyshu.net.api_cassava.exceptions.UserDataFormatExeption;
+import vyshu.net.api_cassava.models.User;
 import vyshu.net.api_cassava.utils.ValidateDataUsersUtil;
 
 import java.util.List;
@@ -141,6 +142,24 @@ public class UserRepository {
             return encoder.matches(password, storedPassword);
         } catch (EmptyResultDataAccessException e) {
             return false;
+        }
+    }
+
+    public User findByUsername(String username) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    "SELECT * FROM users WHERE username = ?",
+                    (rs, rowNum) -> new User(
+                            rs.getLong("idusers"),
+                            rs.getString("username"),
+                            rs.getString("email"),
+                            rs.getString("password"),
+                            rs.getTimestamp("created_at").toLocalDateTime(),
+                            rs.getTimestamp("last_connection").toLocalDateTime(),
+                            rs.getString("role")),
+                    username);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 }
