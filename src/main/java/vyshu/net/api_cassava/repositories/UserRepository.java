@@ -4,6 +4,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
+
+import vyshu.net.api_cassava.exceptions.UserDataFormatExeption;
 import vyshu.net.api_cassava.utils.ValidateDataUsersUtil;
 
 import java.util.List;
@@ -43,7 +45,7 @@ public class UserRepository {
     public void updatePassword(String identifier, String newPassword) {
         newPassword = newPassword.trim();
         if (!"Valid".equals(validateDataUsersUtil.verifyPassword(newPassword))) {
-            throw new IllegalArgumentException(validateDataUsersUtil.verifyPassword(newPassword));
+            throw new UserDataFormatExeption(validateDataUsersUtil.verifyPassword(newPassword));
         }
         jdbcTemplate.update("UPDATE users SET password = ? WHERE email = ? OR username = ?",
                 encoder.encode(newPassword), identifier, identifier);
@@ -65,13 +67,13 @@ public class UserRepository {
         String emailValidationResult = validateDataUsersUtil.verifyEmail(email, this);
         String usernameValidationResult = validateDataUsersUtil.verifyUsername(username, this);
         if (!"Valid".equals(emailValidationResult)) {
-            throw new IllegalArgumentException(emailValidationResult);
+            throw new UserDataFormatExeption(emailValidationResult);
         }
         if (!"Valid".equals(usernameValidationResult)) {
-            throw new IllegalArgumentException(usernameValidationResult);
+            throw new UserDataFormatExeption(usernameValidationResult);
         }
         if (!"Valid".equals(validateDataUsersUtil.verifyPassword(password))) {
-            throw new IllegalArgumentException(validateDataUsersUtil.verifyPassword(password));
+            throw new UserDataFormatExeption(validateDataUsersUtil.verifyPassword(password));
         }
         jdbcTemplate.update("INSERT INTO users (username, email, password, last_connection) VALUES (?, ?, ?, NOW())",
                 username, email, encoder.encode(password));
@@ -85,7 +87,7 @@ public class UserRepository {
         if (count != null && count > 0) {
             jdbcTemplate.update("DELETE FROM user_tokens WHERE token_id = ?", tokenId);
         } else {
-            throw new IllegalArgumentException("Token does not belong to the provided email");
+            throw new UserDataFormatExeption("Token does not belong to the provided email");
         }
     }
 
@@ -93,7 +95,7 @@ public class UserRepository {
         newUsername = newUsername.toLowerCase().trim();
         String usernameValidationResult = validateDataUsersUtil.verifyUsername(newUsername, this);
         if (!"Valid".equals(usernameValidationResult)) {
-            throw new IllegalArgumentException(usernameValidationResult);
+            throw new UserDataFormatExeption(usernameValidationResult);
         }
         jdbcTemplate.update("UPDATE users SET username = ? WHERE email = ?", newUsername, email);
     }
@@ -114,10 +116,11 @@ public class UserRepository {
         }
     }
 
-    public boolean existsTokenByEmail(String email, String token) {
+    public boolean existsTokenByEmail(String email, String tokenId, String token) {
         try {
-            String storedToken = jdbcTemplate.queryForObject("SELECT token FROM user_tokens WHERE email = ?",
-                    String.class, email);
+            String storedToken = jdbcTemplate.queryForObject(
+                    "SELECT token FROM user_tokens WHERE email = ? AND token_id = ?",
+                    String.class, email, tokenId);
             return encoder.matches(token, storedToken);
         } catch (EmptyResultDataAccessException e) {
             return false;

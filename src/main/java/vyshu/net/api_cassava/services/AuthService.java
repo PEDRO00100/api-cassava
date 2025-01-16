@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import vyshu.net.api_cassava.repositories.AuthException;
 import vyshu.net.api_cassava.repositories.UserRepository;
 import vyshu.net.api_cassava.utils.JwtUtil;
 
@@ -24,7 +25,7 @@ public class AuthService {
         userRepository.saveNewUser(username, email, password);
         Optional<Map<String, Object>> userOptional = userRepository.findByIdentifier(email);
         if (userOptional.isEmpty()) {
-            throw new IllegalStateException("Error retrieving user after registration");
+            throw new AuthException("Error retrieving user after registration");
         }
         Map<String, Object> user = userOptional.get();
         String tokenId = UUID.randomUUID().toString();
@@ -42,7 +43,7 @@ public class AuthService {
         Optional<Map<String, Object>> userOptional = userRepository.findByIdentifier(identifier);
 
         if (userOptional.isEmpty() || !userRepository.validatePassword(identifier, password)) {
-            throw new IllegalArgumentException("Credentials do not match");
+            throw new AuthException("Credentials do not match");
         }
         Map<String, Object> user = userOptional.get();
 

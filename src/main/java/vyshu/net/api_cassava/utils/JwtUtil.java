@@ -75,7 +75,8 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         String email = extractEmail(token);
-        if (!userRepository.existsTokenByEmail(email, token)) {
+        String tokenId = extractUUID(token);
+        if (!userRepository.existsTokenByEmail(email, tokenId, token)) {
             return false;
         }
         try {

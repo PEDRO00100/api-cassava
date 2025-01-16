@@ -70,7 +70,7 @@ public class AuthController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             response.put("message", "Token is invalid");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -84,7 +84,7 @@ public class AuthController {
             return new ResponseEntity<Map<String, String>>(response, HttpStatus.OK);
         }
         response.put("message", "Token is invalid");
-        return new ResponseEntity<Map<String, String>>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<Map<String, String>>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/revoke/token")
@@ -93,7 +93,7 @@ public class AuthController {
         Map<String, String> response = new HashMap<>();
         if (!jwtUtil.validateToken(token)) {
             response.put("error", "Invalid token");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
         try {
             userRepository.revokeTokenById(tokenId, jwtUtil.extractEmail(token));
