@@ -35,6 +35,7 @@ public class AuthController {
         Map<String, String> response = new HashMap<>();
         String device = request.getHeader("User-Agent");
         try {
+            device = device.trim().toLowerCase();
             response.put("Bearer", authService.login(identifier, password, device));
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Error e) {
@@ -50,6 +51,7 @@ public class AuthController {
         Map<String, String> response = new HashMap<>();
         String device = request.getHeader("User-Agent");
         try {
+            device = device.trim().toLowerCase();
             response.put("Bearer", authService.register(username, email, password, device));
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Error e) {
@@ -63,9 +65,9 @@ public class AuthController {
         Map<String, String> response = new HashMap<>();
         if (jwtUtil.validateToken(token)) {
             String email = jwtUtil.extractEmail(token);
-                userRepository.updateLastConnection(email);
-                response.put("message", "Token is valid");
-                return new ResponseEntity<>(response, HttpStatus.OK);
+            userRepository.updateLastConnection(email);
+            response.put("message", "Token is valid");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             response.put("message", "Token is invalid");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -76,22 +78,22 @@ public class AuthController {
     public String postMethodName(@RequestParam(required = true) String token) {
         if (jwtUtil.validateToken(token)) {
             String UUID = jwtUtil.extractUUID(token);
-            userRepository.revokeTokenById(UUID);
+            userRepository.revokeTokenById(UUID, jwtUtil.extractEmail(token));
             return "Token revoked successfully";
         }
         return "Invalid token";
     }
 
     @PostMapping("/revoke/token")
-    public ResponseEntity<Map<String, String>> revokeToken(@RequestParam(required = true) String tokenId,
-            @RequestParam(required = true) String token) {
+    public ResponseEntity<Map<String, String>> revokeToken(@RequestParam(required = true) String token,
+            @RequestParam(required = true) String tokenId) {
         Map<String, String> response = new HashMap<>();
         if (!jwtUtil.validateToken(token)) {
             response.put("error", "Invalid token");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         try {
-            userRepository.revokeTokenById(tokenId);
+            userRepository.revokeTokenById(tokenId, jwtUtil.extractEmail(token));
             response.put("message", "Token revoked successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Error e) {

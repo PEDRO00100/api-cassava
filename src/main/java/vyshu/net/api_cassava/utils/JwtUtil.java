@@ -36,6 +36,11 @@ public class JwtUtil {
     }
 
     public String generateToken(String username, String email, String role, String device, String UUID) {
+        username = username.trim().toLowerCase();
+        email = email.trim().toLowerCase();
+        role = role.trim().toLowerCase();
+        device = device.trim().toLowerCase();
+        UUID = UUID.trim();
         return Jwts.builder()
                 .setSubject(username)
                 .claim("email", email)
@@ -49,7 +54,7 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        return extractClaim(token, "username");
+        return extractAllClaims(token).getSubject();
     }
 
     public String extractEmail(String token) {
@@ -73,13 +78,12 @@ public class JwtUtil {
         if (!userRepository.existsTokenByEmail(email, token)) {
             return false;
         }
-
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             String UUID = extractUUID(token);
-            userRepository.revokeTokenById(UUID);
+            userRepository.revokeTokenById(UUID, email);
             return false;
         }
     }
