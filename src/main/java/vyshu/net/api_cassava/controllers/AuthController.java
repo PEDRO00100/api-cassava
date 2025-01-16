@@ -75,13 +75,16 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public String postMethodName(@RequestParam(required = true) String token) {
+    public ResponseEntity<Map<String, String>> logout(@RequestParam(required = true) String token) {
+        Map<String, String> response = new HashMap<>();
         if (jwtUtil.validateToken(token)) {
             String UUID = jwtUtil.extractUUID(token);
             userRepository.revokeTokenById(UUID, jwtUtil.extractEmail(token));
-            return "Token revoked successfully";
+            response.put("message", "Token revoked successfully");
+            return new ResponseEntity<Map<String, String>>(response, HttpStatus.OK);
         }
-        return "Invalid token";
+        response.put("message", "Token is invalid");
+        return new ResponseEntity<Map<String, String>>(response, HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/revoke/token")
