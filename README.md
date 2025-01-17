@@ -154,25 +154,102 @@ Para ejecutar las pruebas, utiliza el siguiente comando:
 
 ### Autenticación
 
-- **POST /auth/v1/login**: Inicia sesión con un identificador (email o nombre de usuario) y contraseña.
-- **POST /auth/v1/register**: Registra un nuevo usuario.
-- **POST /auth/v1/validate/token**: Valida un token JWT.
-- **POST /auth/v1/logout**: Revoca un token JWT.
-- **POST /auth/v1/revoke/token**: Revoca un token específico.
+- **POST /auth/v1/login**
+  - **Descripción**: Inicia sesión con un identificador (email o nombre de usuario) y contraseña.
+  - **Parámetros**:
+    - `identifier` (requerido): Email o nombre de usuario.
+    - `password` (requerido): Contraseña del usuario.
+  - **Respuesta**:
+    - `Bearer` (string): Token JWT de autenticación.
+
+- **POST /auth/v1/register**
+  - **Descripción**: Registra un nuevo usuario.
+  - **Parámetros**:
+    - `username` (requerido): Nombre de usuario.
+    - `email` (requerido): Correo electrónico del usuario.
+    - `password` (requerido): Contraseña del usuario.
+  - **Respuesta**:
+    - `Bearer` (string): Token JWT del nuevo usuario.
+
+- **POST /auth/v1/validate/token**
+  - **Descripción**: Valida un token JWT.
+  - **Parámetros**:
+    - `token` (requerido): Token JWT a validar.
+  - **Respuesta**:
+    - `message` (string): Mensaje indicando si el token es válido o no.
+
+- **POST /auth/v1/logout**
+  - **Descripción**: Revoca un token JWT.
+  - **Parámetros**:
+    - `token` (requerido): Token JWT a revocar.
+  - **Respuesta**:
+    - `message` (string): Mensaje indicando si el token fue revocado correctamente.
+
+- **POST /auth/v1/revoke/token**
+  - **Descripción**: Revoca un token específico.
+  - **Parámetros**:
+    - `token` (requerido): Token JWT a revocar.
+    - `tokenId` (requerido): ID del token a revocar.
+  - **Respuesta**:
+    - `message` (string): Mensaje indicando si el token fue revocado correctamente.
 
 ### Gestión de Usuarios
 
-- **POST /dashboard/v1/change-password**: Cambia la contraseña de un usuario.
-- **POST /dashboard/v1/change-username**: Cambia el nombre de usuario.
-- **POST /dashboard/v1/get-tokens**: Obtiene todos los tokens de un usuario.
+- **POST /dashboard/v1/change-password**
+  - **Descripción**: Cambia la contraseña de un usuario.
+  - **Parámetros**:
+    - `token` (requerido): Token JWT del usuario.
+    - `oldPassword` (requerido): Contraseña actual del usuario.
+    - `newPassword` (requerido): Nueva contraseña del usuario.
+  - **Respuesta**:
+    - `Bearer` (string): Nuevo token JWT después de cambiar la contraseña.
+
+- **POST /dashboard/v1/change-username**
+  - **Descripción**: Cambia el nombre de usuario.
+  - **Parámetros**:
+    - `token` (requerido): Token JWT del usuario.
+    - `newUsername` (requerido): Nuevo nombre de usuario.
+  - **Respuesta**:
+    - `Bearer` (string): Token JWT actualizado con el nuevo nombre de usuario.
+
+- **POST /dashboard/v1/get-tokens**
+  - **Descripción**: Obtiene todos los tokens asociados a un usuario.
+  - **Parámetros**:
+    - `token` (requerido): Token JWT del usuario.
+  - **Respuesta**:
+    - `tokens` (list): Lista de tokens asociados al usuario.
 
 ### API
 
-- **GET /api/flavour**: Obtiene los sabores de Cassava.
-- **GET /api/size**: Obtiene los tamaños disponibles.
-- **GET /api/temperature**: Obtiene las temperaturas disponibles.
-- **GET /api/milk**: Obtiene los tipos de leche disponibles.
-- **GET /api/topping**: Obtiene las coberturas disponibles.
+- **GET /api/flavour**
+  - **Descripción**: Obtiene los sabores de Cassava.
+  - **Parámetros**: Ninguno
+  - **Respuesta**:
+    - `flavours` (map): Mapa de sabores organizados por categorías con detalles.
+
+- **GET /api/size**
+  - **Descripción**: Obtiene los tamaños disponibles.
+  - **Parámetros**: Ninguno
+  - **Respuesta**:
+    - `sizes` (list): Lista de tamaños disponibles (por ejemplo, "Small", "Medium", "Large").
+
+- **GET /api/temperature**
+  - **Descripción**: Obtiene las temperaturas disponibles.
+  - **Parámetros**: Ninguno
+  - **Respuesta**:
+    - `temperatures` (list): Lista de temperaturas disponibles (por ejemplo, "Hot", "Iced").
+
+- **GET /api/milk**
+  - **Descripción**: Obtiene los tipos de leche disponibles.
+  - **Parámetros**: Ninguno
+  - **Respuesta**:
+    - `milks` (list): Lista de tipos de leche disponibles (por ejemplo, "Whole Milk", "Skim Milk", "Almond Milk", "Oat Milk").
+
+- **GET /api/topping**
+  - **Descripción**: Obtiene las coberturas disponibles.
+  - **Parámetros**: Ninguno
+  - **Respuesta**:
+    - `toppings` (list): Lista de coberturas disponibles (por ejemplo, "Whipped Cream", "Chocolate Chips", "Sprinkles", "Caramel Drizzle").
 
 ## Contribuciones
 
