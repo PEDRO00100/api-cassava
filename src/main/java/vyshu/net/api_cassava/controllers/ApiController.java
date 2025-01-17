@@ -6,10 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import vyshu.net.api_cassava.services.WebScrapingService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,38 +22,50 @@ public class ApiController {
         this.webScrapingService = webScrapingService;
     }
 
-    @GetMapping("/flavours")
-    public ResponseEntity<Map<String, Map<String, WebScrapingService.FlavourDetails>>> getCassavaFlavours() {
+    @GetMapping("/flavour")
+    public ResponseEntity<Map<String, Map<String, Map<String, WebScrapingService.FlavourDetails>>>> getCassavaFlavours() {
         try {
-            String jsonResponse = webScrapingService.getCassavaFlavours();
-            ObjectMapper objectMapper = new ObjectMapper();
-            @SuppressWarnings("unchecked")
-            Map<String, Map<String, WebScrapingService.FlavourDetails>> flavourData = objectMapper
-                    .readValue(jsonResponse, Map.class);
-            return new ResponseEntity<>(flavourData, HttpStatus.OK);
+            Map<String, Map<String, WebScrapingService.FlavourDetails>> flavours = webScrapingService
+                    .getCassavaFlavours();
+            Map<String, Map<String, Map<String, WebScrapingService.FlavourDetails>>> response = new HashMap<>();
+            response.put("flavours", flavours);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/sizes")
-    public ResponseEntity<List<String>> getSizes() {
-        return handleServiceCall(() -> webScrapingService.getSizes());
+    @GetMapping("/size")
+    public ResponseEntity<Map<String, List<String>>> getSizes() {
+        return handleServiceCall(() -> {
+            List<String> sizes = webScrapingService.getSizes();
+            return Map.of("sizes", sizes);
+        });
     }
 
     @GetMapping("/temperature")
-    public ResponseEntity<List<String>> getTemperature() {
-        return handleServiceCall(() -> webScrapingService.getTemperature());
+    public ResponseEntity<Map<String, List<String>>> getTemperature() {
+        return handleServiceCall(() -> {
+            List<String> temperature = webScrapingService.getTemperature();
+            return Map.of("temperatures", temperature);
+        });
     }
 
-    @GetMapping("/milk-types")
-    public ResponseEntity<List<String>> getMilkTypes() {
-        return handleServiceCall(() -> webScrapingService.getMilkTypes());
+    @GetMapping("/milk")
+    public ResponseEntity<Map<String, List<String>>> getMilkTypes() {
+        return handleServiceCall(() -> {
+            List<String> milkTypes = webScrapingService.getMilkTypes();
+            return Map.of("milks", milkTypes);
+        });
     }
 
-    @GetMapping("/toppings")
-    public ResponseEntity<List<String>> getToppings() {
-        return handleServiceCall(() -> webScrapingService.getToppings());
+    @GetMapping("/topping")
+    public ResponseEntity<Map<String, List<String>>> getToppings() {
+        return handleServiceCall(() -> {
+            List<String> toppings = webScrapingService.getToppings();
+            return Map.of("toppings", toppings);
+        });
     }
 
     private <T> ResponseEntity<T> handleServiceCall(ServiceCall<T> serviceCall) {
