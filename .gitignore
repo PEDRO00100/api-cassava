@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Application Properties ###
-**/*.properties
+**/application.properties
