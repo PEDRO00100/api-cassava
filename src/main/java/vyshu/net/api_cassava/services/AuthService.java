@@ -4,9 +4,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import vyshu.net.api_cassava.repositories.AuthException;
+import vyshu.net.api_cassava.exceptions.AuthException;
 import vyshu.net.api_cassava.repositories.UserRepository;
 import vyshu.net.api_cassava.utils.JwtUtil;
 
@@ -15,10 +16,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, JwtUtil jwtUtil) {
+    public AuthService(UserRepository userRepository, JwtUtil jwtUtil, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String register(String username, String email, String password, String device) {
@@ -46,6 +49,14 @@ public class AuthService {
             throw new AuthException("Credentials do not match");
         }
         Map<String, Object> user = userOptional.get();
+
+        // Verificar si la contraseña necesita ser actualizada
+        String storedPassword = (String) user.get("password");
+        if (storedPassword.startsWith("$2a$10$")) {
+            // Re-codificar la contraseña con el nuevo factor de costo
+            String newEncodedPassword = passwordEncoder.encode(password);
+            userRepository.updatePassword(identifier, newEncodedPassword);
+        }
 
         userRepository.updateLastConnection((String) user.get("email"));
         String tokenId = UUID.randomUUID().toString();

@@ -1,4 +1,4 @@
-package vyshu.net.api_cassava.repositories;
+package vyshu.net.api_cassava.exceptions;
 
 public class AuthException extends RuntimeException {
     public AuthException(String message) {

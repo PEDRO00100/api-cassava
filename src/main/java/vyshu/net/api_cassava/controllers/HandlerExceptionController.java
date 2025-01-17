@@ -11,9 +11,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import vyshu.net.api_cassava.exceptions.UserDataFormatExeption;
+import vyshu.net.api_cassava.exceptions.*;
 import vyshu.net.api_cassava.models.ErrorDto;
-import vyshu.net.api_cassava.repositories.AuthException;
 
 @RestControllerAdvice
 public class HandlerExceptionController {
